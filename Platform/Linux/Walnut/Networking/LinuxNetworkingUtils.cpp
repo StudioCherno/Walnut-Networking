@@ -2,7 +2,7 @@
 
 namespace Walnut::Utils {
 
-	std::string ResolveHostName(std::string_view name)
+	std::string ResolveDomainName(std::string_view name)
 	{
         // TODO(Yan): implement this
         return {};

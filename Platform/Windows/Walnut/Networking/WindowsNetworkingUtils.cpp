@@ -5,11 +5,11 @@
 
 namespace Walnut::Utils {
 
-	std::string ResolveHostName(std::string_view name)
+	std::string ResolveDomainName(std::string_view name)
 	{
         // Adapted from example at https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
         // TODO(Yan): better error logging
-        
+
 		WSADATA wsaData;
 		int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 		if (iResult != 0)
