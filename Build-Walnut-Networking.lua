@@ -11,14 +11,18 @@ project "Walnut-Networking"
    {
       "Source",
 
-      "../vendor/imgui",
-      "../vendor/glfw/include",
-      "../vendor/glm",
-      "../vendor/spdlog/include",
+      "vendor/GameNetworkingSockets/include",
 
-      "../Walnut/Source",
+      --------------------------------------------------------
+      -- Walnut includes
+      -- Assumes we are in Walnut-Modules/Walnut-Networking
+      "../../Walnut/Source",
 
-      "vendor/GameNetworkingSockets/include"
+      "../../vendor/imgui",
+      "../../vendor/glfw/include",
+      "../../vendor/glm",
+      "../../vendor/spdlog/include",
+      --------------------------------------------------------
    }
 
    targetdir ("../../bin/" .. outputdir .. "/%{prj.name}")
