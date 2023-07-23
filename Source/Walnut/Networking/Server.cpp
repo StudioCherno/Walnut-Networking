@@ -70,7 +70,7 @@ namespace Walnut {
 		m_PollGroup = m_Interface->CreatePollGroup();
 		if (m_PollGroup == k_HSteamNetPollGroup_Invalid)
 		{
-			OnFatalError(fmt::format("Fatal error: Failed to listen on port {}", m_Port));
+			OnFatalError(fmt::format("Fatal error: Failed to create poll group on port {}", m_Port));
 			return;
 		}
 
