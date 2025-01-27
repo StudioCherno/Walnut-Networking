@@ -1,14 +1,18 @@
 #include "Walnut/Networking/NetworkingUtils.h"
 
+#include "Walnut/Utils/StringUtils.h"
+
 #include <WinSock2.h>
 #include <ws2tcpip.h>
+
+#include <vector>
 
 namespace Walnut::Utils {
 
 	std::string ResolveDomainName(std::string_view name)
 	{
-        // Adapted from example at https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
-        // TODO(Yan): better error logging
+		// Adapted from example at https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
+		// TODO(Yan): better error logging
 
 		WSADATA wsaData;
 		int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -16,6 +20,18 @@ namespace Walnut::Utils {
 		{
 			printf("WSAStartup failed with %u\n", WSAGetLastError());
 			return {};
+		}
+
+		bool hasPort = name.find(":") != std::string::npos;
+		std::string domain, port;
+		if (hasPort)
+		{
+			std::vector<std::string> domainAndPort = SplitString(name, ':');
+			if (domainAndPort.size() != 2)
+				return {};
+			domain = domainAndPort[0];
+			port = domainAndPort[1];
+			name = domain;
 		}
 
 		addrinfo hints;
@@ -38,41 +54,41 @@ namespace Walnut::Utils {
 		{
 			switch (ptr->ai_family)
 			{
-				case AF_UNSPEC:
-					// Unspecified
-					break;
-				case AF_INET:
-				{
-					sockaddr_in* sockaddr_ipv4 = (sockaddr_in*)ptr->ai_addr;
-					char* ipAddress = inet_ntoa(sockaddr_ipv4->sin_addr);
-					ipAddressStr = ipAddress;
-					break;
-				}
-				case AF_INET6:
-				{
-					const DWORD ipbufferlength = 46;
-					char ipstringbuffer[ipbufferlength];
-					DWORD actualIPBufferLength = ipbufferlength;
-					LPSOCKADDR sockaddr_ip = (LPSOCKADDR)ptr->ai_addr;
-					INT iRetval = WSAAddressToStringA(sockaddr_ip, (DWORD)ptr->ai_addrlen, nullptr, ipstringbuffer, &actualIPBufferLength);
-
-					if (iRetval)
-					{
-						printf("WSAAddressToString failed with %u\n", WSAGetLastError());
-                        WSACleanup();
-						return {};
-					}
-
-					ipAddressStr = std::string(ipstringbuffer, actualIPBufferLength);
-				}
+			case AF_UNSPEC:
+				// Unspecified
+				break;
+			case AF_INET:
+			{
+				sockaddr_in* sockaddr_ipv4 = (sockaddr_in*)ptr->ai_addr;
+				char* ipAddress = inet_ntoa(sockaddr_ipv4->sin_addr);
+				ipAddressStr = ipAddress;
+				break;
 			}
-				
+			case AF_INET6:
+			{
+				const DWORD ipbufferlength = 46;
+				char ipstringbuffer[ipbufferlength];
+				DWORD actualIPBufferLength = ipbufferlength;
+				LPSOCKADDR sockaddr_ip = (LPSOCKADDR)ptr->ai_addr;
+				INT iRetval = WSAAddressToStringA(sockaddr_ip, (DWORD)ptr->ai_addrlen, nullptr, ipstringbuffer, &actualIPBufferLength);
+
+				if (iRetval)
+				{
+					printf("WSAAddressToString failed with %u\n", WSAGetLastError());
+					WSACleanup();
+					return {};
+				}
+
+				ipAddressStr = std::string(ipstringbuffer, actualIPBufferLength);
+			}
+			}
+
 		}
 
 		freeaddrinfo(addressResult);
 		WSACleanup();
 
-		return ipAddressStr;
+		return hasPort ? (ipAddressStr + ":" + port) : ipAddressStr;
 	}
 
 }

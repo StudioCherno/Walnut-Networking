@@ -125,7 +125,8 @@ namespace Walnut {
 
 					// Either ClosedByPeer or ProblemDetectedLocally - should be communicated to user callback
 					// User callback
-					m_ClientDisconnectedCallback(itClient->second);
+					if (m_ClientDisconnectedCallback)
+						m_ClientDisconnectedCallback(itClient->second);
 
 					m_ConnectedClients.erase(itClient);
 				}
@@ -175,7 +176,8 @@ namespace Walnut {
 				client.ConnectionDesc = connectionInfo.m_szConnectionDescription;
 
 				// User callback
-				m_ClientConnectedCallback(client);
+				if (m_ClientConnectedCallback)
+					m_ClientConnectedCallback(client);
 
 				break;
 			}
@@ -222,7 +224,10 @@ namespace Walnut {
 			}
 
 			if (incomingMessage->m_cbSize)
-				m_DataReceivedCallback(itClient->second, Buffer(incomingMessage->m_pData, incomingMessage->m_cbSize));
+			{
+				if (m_DataReceivedCallback)
+					m_DataReceivedCallback(itClient->second, Buffer(incomingMessage->m_pData, incomingMessage->m_cbSize));
+			}
 
 			// Release when done
 			incomingMessage->Release();

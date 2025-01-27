@@ -59,6 +59,8 @@ namespace Walnut {
 		bool IsRunning() const { return m_Running; }
 		ConnectionStatus GetConnectionStatus() const { return m_ConnectionStatus; }
 		const std::string& GetConnectionDebugMessage() const { return m_ConnectionDebugMessage; }
+
+		uint32_t GetID() const { return m_Connection; }
 	private:
 		void NetworkThreadFunc();
 		void Shutdown();
@@ -79,7 +81,7 @@ namespace Walnut {
 		ConnectionStatus m_ConnectionStatus = ConnectionStatus::Disconnected;
 		std::string m_ConnectionDebugMessage;
 
-		std::string m_ServerAddress;
+		std::string m_ServerAddress, m_ServerIPAddress;
 		bool m_Running = false;
 
 		ISteamNetworkingSockets* m_Interface = nullptr;

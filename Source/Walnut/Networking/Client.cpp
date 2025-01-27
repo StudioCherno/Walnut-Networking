@@ -1,5 +1,7 @@
 #include "Client.h"
 
+#include "Walnut/Networking/NetworkingUtils.h"
+
 #include <iostream>
 
 #include <spdlog/spdlog.h>
@@ -68,11 +70,16 @@ namespace Walnut {
 		// Select instance to use.  For now we'll always use the default.
 		m_Interface = SteamNetworkingSockets();
 
+		if (Utils::IsValidIPAddress(m_ServerAddress))
+			m_ServerIPAddress = m_ServerAddress;
+		else
+			m_ServerIPAddress = Utils::ResolveDomainName(m_ServerAddress);
+
 		// Start connecting
 		SteamNetworkingIPAddr address;
-		if (!address.ParseString(m_ServerAddress.c_str()))
+		if (!address.ParseString(m_ServerIPAddress.c_str()))
 		{
-			OnFatalError(fmt::format("Invalid IP address - could not parse {}", m_ServerAddress));
+			OnFatalError(fmt::format("Invalid IP address - could not parse {}", m_ServerIPAddress));
 			m_ConnectionDebugMessage = "Invalid IP address";
 			m_ConnectionStatus = ConnectionStatus::FailedToConnect;
 			return;
@@ -202,7 +209,8 @@ namespace Walnut {
 
 			case k_ESteamNetworkingConnectionState_Connected:
 				m_ConnectionStatus = ConnectionStatus::Connected;
-				m_ServerConnectedCallback();
+				if (m_ServerConnectedCallback)
+					m_ServerConnectedCallback();
 				break;
 
 			default:

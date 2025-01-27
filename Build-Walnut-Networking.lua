@@ -34,6 +34,7 @@ project "Walnut-Networking"
       files { "Platform/Windows/**.h", "Platform/Windows/**.cpp" }
       includedirs { "Platform/Windows" }
       links { "Ws2_32.lib" }
+      buildoptions { "/utf-8" }
 
    filter "system:linux"
       defines { "WL_PLATFORM_LINUX" }
