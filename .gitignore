@@ -1,0 +1,11 @@
+# Temporary files
+*~
+*.swp
+
+# Files
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+*.sln
+*.log
+Makefile
